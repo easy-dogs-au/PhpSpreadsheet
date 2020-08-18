@@ -388,17 +388,21 @@ class Workbook extends WriterPart
             $objWriter->writeAttribute('name', '_xlnm.Print_Area');
             $objWriter->writeAttribute('localSheetId', $pSheetId);
 
-            // Print area
-            $printArea = Coordinate::splitRange($pSheet->getPageSetup()->getPrintArea());
+            if(strpos($pSheet->getPageSetup()->getPrintArea(), '=') !== 0) {
+                // Print area
+                $printArea = Coordinate::splitRange($pSheet->getPageSetup()->getPrintArea());
 
-            $chunks = [];
-            foreach ($printArea as $printAreaRect) {
-                $printAreaRect[0] = Coordinate::absoluteReference($printAreaRect[0]);
-                $printAreaRect[1] = Coordinate::absoluteReference($printAreaRect[1]);
-                $chunks[] = '\'' . str_replace("'", "''", $pSheet->getTitle()) . '\'!' . implode(':', $printAreaRect);
+                $chunks = [];
+                foreach ($printArea as $printAreaRect) {
+                    $printAreaRect[0] = Coordinate::absoluteReference($printAreaRect[0]);
+                    $printAreaRect[1] = Coordinate::absoluteReference($printAreaRect[1]);
+                    $chunks[] = '\'' . str_replace("'", "''", $pSheet->getTitle()) . '\'!' . implode(':', $printAreaRect);
+                }
+
+                $objWriter->writeRawData(implode(',', $chunks));
+            } else {
+                $objWriter->writeRawData(substr($pSheet->getPageSetup()->getPrintArea(), 1));
             }
-
-            $objWriter->writeRawData(implode(',', $chunks));
 
             $objWriter->endElement();
         }

@@ -665,14 +665,16 @@ class PageSetup
      */
     public function setPrintArea($value, $index = 0, $method = self::SETPRINTRANGE_OVERWRITE)
     {
-        if (strpos($value, '!') !== false) {
-            throw new PhpSpreadsheetException('Cell coordinate must not specify a worksheet.');
-        } elseif (strpos($value, ':') === false) {
-            throw new PhpSpreadsheetException('Cell coordinate must be a range of cells.');
-        } elseif (strpos($value, '$') !== false) {
-            throw new PhpSpreadsheetException('Cell coordinate must not be absolute.');
+        if (strpos($value, '=') !== 0) {
+            if (strpos($value, '!') !== false) {
+                throw new PhpSpreadsheetException('Cell coordinate must not specify a worksheet.');
+            } elseif (strpos($value, ':') === false) {
+                throw new PhpSpreadsheetException('Cell coordinate must be a range of cells.');
+            } elseif (strpos($value, '$') !== false) {
+                throw new PhpSpreadsheetException('Cell coordinate must not be absolute.');
+            }
+            $value = strtoupper($value);
         }
-        $value = strtoupper($value);
 
         if ($method == self::SETPRINTRANGE_OVERWRITE) {
             if ($index == 0) {
